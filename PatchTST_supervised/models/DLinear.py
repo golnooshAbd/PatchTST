@@ -50,6 +50,8 @@ class Model(nn.Module):
         self.individual = configs.individual
         self.channels = configs.enc_in
 
+        self.features = configs.features
+
         if self.individual:
             self.Linear_Seasonal = nn.ModuleList()
             self.Linear_Trend = nn.ModuleList()

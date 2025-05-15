@@ -39,5 +39,6 @@ do
       --stride 8\
       --des 'Exp' \
       --train_epochs 100\
+      --gpu 1 \
       --itr 1 --batch_size 128 --learning_rate 0.0001 >logs/LongForecasting/$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log 
 done

@@ -27,6 +27,8 @@ if __name__ == '__main__':
     parser.add_argument('--freq', type=str, default='h',
                         help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
     parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
+    parser.add_argument('--exo', default=True, action=argparse.BooleanOptionalAction, help='exogenous variables')
+    parser.add_argument('--exo_future', default=True, action=argparse.BooleanOptionalAction, help='exogenous variables for future time steps')
 
     # forecasting task
     parser.add_argument('--seq_len', type=int, default=96, help='input sequence length')
@@ -117,11 +119,12 @@ if __name__ == '__main__':
     if args.is_training:
         for ii in range(args.itr):
             # setting record of experiments
-            setting = '{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}'.format(
+            setting = '{}_{}_{}_ft{}_OT{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}_ind{}_rnd{}'.format(
                 args.model_id,
                 args.model,
                 args.data,
                 args.features,
+                args.target,
                 args.seq_len,
                 args.label_len,
                 args.pred_len,
@@ -133,7 +136,10 @@ if __name__ == '__main__':
                 args.factor,
                 args.embed,
                 args.distil,
-                args.des,ii)
+                args.des,
+                ii,
+                args.individual,
+                args.random_seed)
 
             exp = Exp(args)  # set experiments
             print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
@@ -149,10 +155,11 @@ if __name__ == '__main__':
             torch.cuda.empty_cache()
     else:
         ii = 0
-        setting = '{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}'.format(args.model_id,
+        setting = '{}_{}_{}_ft{}_OT{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}_ind{}_rnd{}'.format(args.model_id,
                                                                                                     args.model,
                                                                                                     args.data,
                                                                                                     args.features,
+                                                                                                    args.target,
                                                                                                     args.seq_len,
                                                                                                     args.label_len,
                                                                                                     args.pred_len,
@@ -164,10 +171,14 @@ if __name__ == '__main__':
                                                                                                     args.factor,
                                                                                                     args.embed,
                                                                                                     args.distil,
-                                                                                                    args.des, ii)
+                                                                                                    args.des, 
+                                                                                                    ii,
+                                                                                                    args.individual,
+                                                                                                    args.random_seed)
 
         exp = Exp(args)  # set experiments
         print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-        exp.test(setting, test=1)
+        exp.test_all(setting, test=1)
+        # exp.accuracy_threshold_plot(setting, test=1)
         torch.cuda.empty_cache()
         

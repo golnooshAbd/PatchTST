@@ -175,7 +175,8 @@ ipython_config.py
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -351,6 +352,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.PTST/
 
 # Spyder project settings
 .spyderproject
@@ -462,4 +464,16 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# PDF files
+*.pdf
+
+# dataset, results and test_results folders
+dataset/
+results/
+test_results/
+checkpoints/
+
+# logs
+*.log
+PatchTST_supervised/result.txt
 # End of https://www.toptal.com/developers/gitignore/api/emacs,jetbrains+all,jupyternotebooks,linux,macos,microsoftoffice,notepadpp,python,tortoisegit,vim,visualstudiocode,windows

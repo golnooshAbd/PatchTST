@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 import time
+from numpy import trapz
 
 plt.switch_backend('agg')
 
@@ -93,11 +94,82 @@ def visual(true, preds=None, name='./pic/test.pdf'):
     Results visualization
     """
     plt.figure()
-    plt.plot(true, label='GroundTruth', linewidth=2)
     if preds is not None:
         plt.plot(preds, label='Prediction', linewidth=2)
+    plt.plot(true, label='GroundTruth', linewidth=2)
     plt.legend()
     plt.savefig(name, bbox_inches='tight')
+    plt.close()
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+def visual_rain(true, preds, rain, error_name=None, error=None, name='./pic/test.pdf', rain_name='Rain'):
+    """
+    Results visualization with consistent font sizes and in-frame legend.
+    """
+    if error is None or error_name is None:
+        pred_err = "Prediction"
+    else:
+        pred_err = f"Prediction {error_name}:{error:.4f}"
+
+    fig, ax1 = plt.subplots(figsize=[15, 6])
+
+    # Plot water height predictions
+    ax1.plot(preds, label=pred_err, color='green', linestyle='--')
+    ax1.plot(true, label='Ground Truth', color='orange')
+    ax1.set_xlabel('Time Step', fontsize=18)
+    ax1.set_ylabel('Water Height', fontsize=18)
+    ax1.tick_params(axis='both', labelsize=18)  # Apply fontsize to both x and y axes
+
+    handles, labels = ax1.get_legend_handles_labels()
+
+    # Plot rain if provided
+    if rain is not None:
+        ax2 = ax1.twinx()
+        ax2.set_ylabel('Precipitation', color='tab:blue', fontsize=18)
+        ax2.fill_between(np.arange(len(rain)), rain, alpha=0.3, label=rain_name, color='tab:blue')
+        ax2.tick_params(axis='y', labelcolor='tab:blue', labelsize=18)
+
+        # Add a patch for rain to combined legend
+        rain_patch = plt.Line2D([0], [0], color='tab:blue', alpha=0.3, lw=10, label=rain_name)
+        handles.append(rain_patch)
+        labels.append(rain_name)
+
+    # Add legend inside the plot frame
+    ax1.legend(handles, labels, fontsize=18, loc='best', frameon=True)
+
+    plt.tight_layout()
+    plt.savefig(name, bbox_inches='tight')
+    plt.close()
+
+
+def visual_plot(train, valid, test, name='./pic/test.pdf'):
+    """
+    Results visualization
+    """
+    plt.figure()
+    plt.plot(train, label='Train', linewidth=2)
+    plt.plot(valid, label='Valid', linewidth=2)
+    plt.plot(test, label='Test', linewidth=1)
+    plt.legend()
+    plt.ylabel('MSE')
+    plt.xlabel('Epoch')
+    plt.savefig(name, bbox_inches='tight')
+
+def visual_acc(mse_threshold, acc_i, path):
+    # AUC Calculation
+    auc = trapz(acc_i, mse_threshold)
+    auc_normalized = auc / (mse_threshold[-1] - mse_threshold[0])
+    # Plot
+    plt.figure() 
+    plt.plot(mse_threshold, acc_i)
+    plt.ylabel('Accuracy')
+    plt.xlabel('Error Threshold')
+    plt.title(f"AUC (raw): {auc:.4f}, AUC (normalized): {auc_normalized:.4f}")
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
+    return auc, auc_normalized
 
 def test_params_flop(model,x_shape):
     """
